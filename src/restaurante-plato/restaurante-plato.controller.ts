@@ -8,15 +8,18 @@ import {
   Body,
   Param,
   HttpCode,
+  UseInterceptors,
 } from '@nestjs/common';
 import { RestaurantePlatoService } from './restaurante-plato.service';
 import { PlatoEntity } from '../plato/plato.entity';
+import { BusinessErrorsInterceptor } from '../shared/interceptors/business-errors.interceptor';
 
-@Controller('restaurantes')
+@Controller('restaurants')
+@UseInterceptors(BusinessErrorsInterceptor)
 export class RestaurantePlatoController {
   constructor(private readonly restaurantePlatoService: RestaurantePlatoService) {}
 
-  @Post(':restauranteId/platos/:platoId')
+  @Post(':restauranteId/dishes/:platoId')
   async addPlatoRestaurante(
     @Param('restauranteId') restauranteId: string,
     @Param('platoId') platoId: string,
@@ -24,12 +27,12 @@ export class RestaurantePlatoController {
     return await this.restaurantePlatoService.addPlatoRestaurante(restauranteId, platoId);
   }
 
-  @Get(':restauranteId/platos')
+  @Get(':restauranteId/dishes')
   async findPlatosByRestauranteId(@Param('restauranteId') restauranteId: string) {
     return await this.restaurantePlatoService.findPlatosByRestauranteId(restauranteId);
   }
 
-  @Get(':restauranteId/platos/:platoId')
+  @Get(':restauranteId/dishes/:platoId')
   async findPlatoByRestauranteIdPlatoId(
     @Param('restauranteId') restauranteId: string,
     @Param('platoId') platoId: string,
@@ -37,15 +40,15 @@ export class RestaurantePlatoController {
     return await this.restaurantePlatoService.findPlatoByRestauranteIdPlatoId(restauranteId, platoId);
   }
 
-  @Put(':restauranteId/platos')
+  @Put(':restauranteId/dishes')
   async associatePlatosRestaurante(
     @Param('restauranteId') restauranteId: string,
-    @Body() platos: PlatoEntity[],
+    @Body() platos: { platos: string[] },
   ) {
-    return await this.restaurantePlatoService.associatePlatosRestaurante(restauranteId, platos);
+    return await this.restaurantePlatoService.associatePlatosRestaurante(restauranteId, platos.platos);
   }
 
-  @Delete(':restauranteId/platos/:platoId')
+  @Delete(':restauranteId/dishes/:platoId')
   @HttpCode(204)
   async deletePlatoRestaurante(
     @Param('restauranteId') restauranteId: string,

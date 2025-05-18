@@ -28,7 +28,7 @@ export class RestaurantePlatoService {
     if (!plato)
       throw new BusinessLogicException(
         'El plato con el id dado no fue encontrado',
-        BusinessError.NOT_FOUND,
+        BusinessError.PRECONDITION_FAILED,
       );
 
     const restaurante: RestauranteEntity = await this.restauranteRepository.findOne({
@@ -88,7 +88,7 @@ export class RestaurantePlatoService {
 
   async associatePlatosRestaurante(
     restauranteId: string,
-    platos: PlatoEntity[],
+    platos: string[],
   ): Promise<RestauranteEntity> {
     const restaurante: RestauranteEntity = await this.restauranteRepository.findOne({
       where: { idRestaurante: restauranteId },
@@ -101,18 +101,20 @@ export class RestaurantePlatoService {
         BusinessError.NOT_FOUND,
       );
 
+    const platosEntities: PlatoEntity[] = [];
     for (let i = 0; i < platos.length; i++) {
       const plato: PlatoEntity = await this.platoRepository.findOne({
-        where: { idPlato: platos[i].idPlato },
+        where: { idPlato: platos[i] },
       });
       if (!plato)
         throw new BusinessLogicException(
-          `El plato con id ${platos[i].idPlato} no fue encontrado`,
+          `El plato con id ${platos[i]} no fue encontrado`,
           BusinessError.NOT_FOUND,
         );
+      platosEntities.push(plato);
     }
 
-    restaurante.platos = platos;
+    restaurante.platos = platosEntities;
     return await this.restauranteRepository.save(restaurante);
   }
 

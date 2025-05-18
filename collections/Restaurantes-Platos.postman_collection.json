@@ -1,16 +1,1025 @@
 {
 	"info": {
-		"_postman_id": "9fc12c12-373d-43eb-9824-6856a9d2d63b",
+		"_postman_id": "a4628647-57e2-44d3-9eb3-20c71629911c",
 		"name": "Restaurantes-Platos",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "43873552"
 	},
 	"item": [
 		{
-			"name": "New Request",
+			"name": "Asociar un plato a un restaurante",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants = pm.collectionVariables.get('baseUrlRestaurants');",
+							"const baseUrlPlato = pm.collectionVariables.get('baseUrlPlato');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrlRestaurants no está definida');",
+							"if (!baseUrlPlato) throw new Error('⚠️ La variable baseUrlPlato no está definida');",
+							"",
+							"// payload restaurante",
+							"const restauranteNombre = pm.variables.replaceIn('{{$randomCompanyName}}');",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear restaurante",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) throw errC;",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"});",
+							"",
+							"// payload plato",
+							"const platoNombre = pm.variables.replaceIn('{{$randomLoremWords}}');",
+							"const platoDescripcion = pm.variables.replaceIn('{{$randomLoremSentence}}');",
+							"const platoPrecio = pm.variables.replaceIn('{{$randomPrice}}');",
+							"const platoCategoria = \"plato_fuerte\";",
+							"",
+							"// ——————————————————————————",
+							"// 3) Crear plato",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlPlato}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: platoNombre,",
+							"      descripcion: platoDescripcion,",
+							"      precio: platoPrecio,",
+							"      categoria: platoCategoria",
+							"    })",
+							"  }",
+							"}, (errC, resPlato) => {",
+							"  if (errC) throw errC;",
+							"  const plato = resPlato.json();",
+							"  const idPlato = plato.idPlato;",
+							"  pm.environment.set('platoId', idPlato);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {",
+							"    pm.expect(pm.response.code).to.equal(201);",
+							"});",
+							"",
+							"pm.test(\"Response has the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.idRestaurante).to.exist;",
+							"    pm.expect(responseData.platos).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:idRestaurant/{{baseUrlPlato}}/:idPlato",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":idRestaurant",
+						"{{baseUrlPlato}}",
+						":idPlato"
+					],
+					"variable": [
+						{
+							"key": "idRestaurant",
+							"value": "{{restaurantId}}"
+						},
+						{
+							"key": "idPlato",
+							"value": "{{platoId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Asociar un plato que no existe a un restaurante",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants = pm.collectionVariables.get('baseUrlRestaurants');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrlRestaurants no está definida');",
+							"",
+							"// payload restaurante",
+							"const restauranteNombre = pm.variables.replaceIn('{{$randomCompanyName}}');",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear restaurante",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) throw errC;",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(412);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:idRestaurant/{{baseUrlPlato}}/:idPlato",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":idRestaurant",
+						"{{baseUrlPlato}}",
+						":idPlato"
+					],
+					"variable": [
+						{
+							"key": "idRestaurant",
+							"value": "{{restaurantId}}"
+						},
+						{
+							"key": "idPlato",
+							"value": "{{$guid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener todos los platos que están en un restaurante",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants = pm.collectionVariables.get('baseUrlRestaurants');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrlRestaurants no está definida');",
+							"",
+							"// payload restaurante",
+							"const restauranteNombre = pm.variables.replaceIn('{{$randomCompanyName}}');",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear restaurante",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) throw errC;",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response is an array\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:idRestaurant/{{baseUrlPlato}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":idRestaurant",
+						"{{baseUrlPlato}}"
+					],
+					"variable": [
+						{
+							"key": "idRestaurant",
+							"value": "{{restaurantId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener un plato asociado a un restaurante",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants = pm.collectionVariables.get('baseUrlRestaurants');",
+							"const baseUrlPlato = pm.collectionVariables.get('baseUrlPlato');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrlRestaurants no está definida');",
+							"if (!baseUrlPlato) throw new Error('⚠️ La variable baseUrlPlato no está definida');",
+							"",
+							"// payload restaurante",
+							"const restauranteNombre = pm.variables.replaceIn('{{$randomCompanyName}}');",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+							"",
+							"// payload plato",
+							"const platoNombre = pm.variables.replaceIn('{{$randomLoremWords}}');",
+							"const platoDescripcion = pm.variables.replaceIn('{{$randomLoremSentence}}');",
+							"const platoPrecio = pm.variables.replaceIn('{{$randomPrice}}');",
+							"const platoCategoria = \"plato_fuerte\";",
+							"",
+							"// ——————————————————————————",
+							"// Ejecutar en cadena para mantener el orden y variables disponibles",
+							"",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) {",
+							"    console.error('Error al crear restaurante:', errC);",
+							"    return;",
+							"  }",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"",
+							"  pm.sendRequest({",
+							"    url: `${baseUrl}/${baseUrlPlato}`,",
+							"    method: 'POST',",
+							"    header: { 'Content-Type': 'application/json' },",
+							"    body: {",
+							"      mode: 'raw',",
+							"      raw: JSON.stringify({",
+							"        nombre: platoNombre,",
+							"        descripcion: platoDescripcion,",
+							"        precio: platoPrecio,",
+							"        categoria: platoCategoria",
+							"      })",
+							"    }",
+							"  }, (errP, resPlato) => {",
+							"    if (errP) {",
+							"      console.error('Error al crear plato:', errP);",
+							"      return;",
+							"    }",
+							"    const plato = resPlato.json();",
+							"    const idPlato = plato.idPlato;",
+							"    pm.environment.set('platoId', idPlato);",
+							"",
+							"    pm.sendRequest({",
+							"      url: `${baseUrl}/${baseUrlRestaurants}/${idRestaurante}/${baseUrlPlato}/${idPlato}`,",
+							"      method: 'POST',",
+							"      header: { 'Content-Type': 'application/json' }",
+							"    }, (errA, resAsociacion) => {",
+							"      if (errA) {",
+							"        console.error('Error al asociar plato al restaurante:', errA);",
+							"        return;",
+							"      }",
+							"      console.log('Plato asociado correctamente al restaurante.');",
+							"    });",
+							"  });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.nombre).to.exist;",
+							"    pm.expect(responseData.descripcion).to.exist;",
+							"    pm.expect(responseData.precio).to.exist;",
+							"    pm.expect(responseData.categoria).to.exist;",
+							"    pm.expect(responseData.idPlato).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:idRestaurant/{{baseUrlPlato}}/:idPlato",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":idRestaurant",
+						"{{baseUrlPlato}}",
+						":idPlato"
+					],
+					"variable": [
+						{
+							"key": "idRestaurant",
+							"value": "{{restaurantId}}"
+						},
+						{
+							"key": "idPlato",
+							"value": "{{platoId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener un plato que no esté asociado a un restaurante",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants = pm.collectionVariables.get('baseUrlRestaurants');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrlRestaurants no está definida');",
+							"",
+							"// payload restaurante",
+							"const restauranteNombre = pm.variables.replaceIn('{{$randomCompanyName}}');",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear restaurante",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) throw errC;",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 412\", function () {",
+							"    pm.expect(pm.response.code).to.equal(412);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:idRestaurant/{{baseUrlPlato}}/:idPlato",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":idRestaurant",
+						"{{baseUrlPlato}}",
+						":idPlato"
+					],
+					"variable": [
+						{
+							"key": "idRestaurant",
+							"value": "{{restaurantId}}"
+						},
+						{
+							"key": "idPlato",
+							"value": "{{$guid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar los platos que están asociados a un restaurante",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants = pm.collectionVariables.get('baseUrlRestaurants');",
+							"const baseUrlPlato = pm.collectionVariables.get('baseUrlPlato');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrlRestaurants no está definida');",
+							"if (!baseUrlPlato) throw new Error('⚠️ La variable baseUrlPlato no está definida');",
+							"",
+							"// payload restaurante",
+							"const restauranteNombre = pm.variables.replaceIn('{{$randomCompanyName}}');",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+							"",
+							"// payload plato",
+							"const platoNombre = pm.variables.replaceIn('{{$randomLoremWords}}');",
+							"const platoDescripcion = pm.variables.replaceIn('{{$randomLoremSentence}}');",
+							"const platoPrecio = pm.variables.replaceIn('{{$randomPrice}}');",
+							"const platoCategoria = \"plato_fuerte\";",
+							"",
+							"// ——————————————————————————",
+							"// Ejecutar en cadena para mantener el orden y variables disponibles",
+							"",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) {",
+							"    console.error('Error al crear restaurante:', errC);",
+							"    return;",
+							"  }",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"",
+							"  pm.sendRequest({",
+							"    url: `${baseUrl}/${baseUrlPlato}`,",
+							"    method: 'POST',",
+							"    header: { 'Content-Type': 'application/json' },",
+							"    body: {",
+							"      mode: 'raw',",
+							"      raw: JSON.stringify({",
+							"        nombre: platoNombre,",
+							"        descripcion: platoDescripcion,",
+							"        precio: platoPrecio,",
+							"        categoria: platoCategoria",
+							"      })",
+							"    }",
+							"  }, (errP, resPlato) => {",
+							"    if (errP) {",
+							"      console.error('Error al crear plato:', errP);",
+							"      return;",
+							"    }",
+							"    const plato = resPlato.json();",
+							"    const idPlato = plato.idPlato;",
+							"    pm.environment.set('platoId', idPlato);",
+							"",
+							"    pm.sendRequest({",
+							"      url: `${baseUrl}/${baseUrlRestaurants}/${idRestaurante}/${baseUrlPlato}/${idPlato}`,",
+							"      method: 'POST',",
+							"      header: { 'Content-Type': 'application/json' }",
+							"    }, (errA, resAsociacion) => {",
+							"      if (errA) {",
+							"        console.error('Error al asociar plato al restaurante:', errA);",
+							"        return;",
+							"      }",
+							"      console.log('Plato asociado correctamente al restaurante.');",
+							"    });",
+							"  });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response has updated fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.idRestaurante).to.exist;",
+							"    pm.expect(responseData.platos).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"platos\": [\"{{platoId}}\"]\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:idRestaurant/{{baseUrlPlato}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":idRestaurant",
+						"{{baseUrlPlato}}"
+					],
+					"variable": [
+						{
+							"key": "idRestaurant",
+							"value": "{{restaurantId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar los platos asociados a un restaurante, con un plato inexistente",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants = pm.collectionVariables.get('baseUrlRestaurants');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrlRestaurants no está definida');",
+							"",
+							"// payload restaurante",
+							"const restauranteNombre = pm.variables.replaceIn('{{$randomCompanyName}}');",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear restaurante",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) throw errC;",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"platos\": [\"{{$guid}}\"]\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:idRestaurant/{{baseUrlPlato}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":idRestaurant",
+						"{{baseUrlPlato}}"
+					],
+					"variable": [
+						{
+							"key": "idRestaurant",
+							"value": "{{restaurantId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar un plato previamente asociado a un restaurante",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants = pm.collectionVariables.get('baseUrlRestaurants');",
+							"const baseUrlPlato = pm.collectionVariables.get('baseUrlPlato');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrlRestaurants no está definida');",
+							"if (!baseUrlPlato) throw new Error('⚠️ La variable baseUrlPlato no está definida');",
+							"",
+							"// payload restaurante",
+							"const restauranteNombre = pm.variables.replaceIn('{{$randomCompanyName}}');",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+							"",
+							"// payload plato",
+							"const platoNombre = pm.variables.replaceIn('{{$randomLoremWords}}');",
+							"const platoDescripcion = pm.variables.replaceIn('{{$randomLoremSentence}}');",
+							"const platoPrecio = pm.variables.replaceIn('{{$randomPrice}}');",
+							"const platoCategoria = \"plato_fuerte\";",
+							"",
+							"// ——————————————————————————",
+							"// Crear restaurante",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) {",
+							"    console.error('Error al crear restaurante:', errC);",
+							"    return;",
+							"  }",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"",
+							"  // Crear plato dentro del callback anterior",
+							"  pm.sendRequest({",
+							"    url: `${baseUrl}/${baseUrlPlato}`,",
+							"    method: 'POST',",
+							"    header: { 'Content-Type': 'application/json' },",
+							"    body: {",
+							"      mode: 'raw',",
+							"      raw: JSON.stringify({",
+							"        nombre: platoNombre,",
+							"        descripcion: platoDescripcion,",
+							"        precio: platoPrecio,",
+							"        categoria: platoCategoria",
+							"      })",
+							"    }",
+							"  }, (errP, resPlato) => {",
+							"    if (errP) {",
+							"      console.error('Error al crear plato:', errP);",
+							"      return;",
+							"    }",
+							"    const plato = resPlato.json();",
+							"    const idPlato = plato.idPlato;",
+							"    pm.environment.set('platoId', idPlato);",
+							"",
+							"    // Asociar plato al restaurante dentro del callback anterior",
+							"    pm.sendRequest({",
+							"      url: `${baseUrl}/${baseUrlRestaurants}/${idRestaurante}/${baseUrlPlato}/${idPlato}`,",
+							"      method: 'POST',",
+							"      header: { 'Content-Type': 'application/json' }",
+							"    }, (errA, resAsociacion) => {",
+							"      if (errA) {",
+							"        console.error('Error al asociar plato al restaurante:', errA);",
+							"        return;",
+							"      }",
+							"      console.log('Plato asociado correctamente al restaurante.');",
+							"    });",
+							"  });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 204\", function () {",
+							"    pm.expect(pm.response.code).to.equal(204);",
+							"});",
+							"",
+							"pm.test(\"Response has no body\", function () {",
+							"    pm.expect(pm.response.text()).to.be.empty;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:idRestaurant/{{baseUrlPlato}}/:idPlato",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":idRestaurant",
+						"{{baseUrlPlato}}",
+						":idPlato"
+					],
+					"variable": [
+						{
+							"key": "idRestaurant",
+							"value": "{{restaurantId}}"
+						},
+						{
+							"key": "idPlato",
+							"value": "{{platoId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar un plato que no estaba previamente asociado a un restaurante",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants = pm.collectionVariables.get('baseUrlRestaurants');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrlRestaurants no está definida');",
+							"",
+							"// payload restaurante",
+							"const restauranteNombre = pm.variables.replaceIn('{{$randomCompanyName}}');",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = pm.variables.replaceIn('{{$randomStreetAddress}}');",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear restaurante",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) throw errC;",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:idRestaurant/{{baseUrlPlato}}/:idPlato",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":idRestaurant",
+						"{{baseUrlPlato}}",
+						":idPlato"
+					],
+					"variable": [
+						{
+							"key": "idRestaurant",
+							"value": "{{restaurantId}}"
+						},
+						{
+							"key": "idPlato",
+							"value": "{{$guid}}"
+						}
+					]
+				}
 			},
 			"response": []
 		}
