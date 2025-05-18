@@ -1,0 +1,573 @@
+{
+	"info": {
+		"_postman_id": "06db47d4-c141-439a-864e-5e001922afbb",
+		"name": "Plato",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43873552"
+	},
+	"item": [
+		{
+			"name": "Crear un plato válido.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {",
+							"    pm.expect(pm.response.code).to.equal(201);",
+							"});",
+							"",
+							"pm.test(\"Response has the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.nombre).to.exist;",
+							"    pm.expect(responseData.descripcion).to.exist;",
+							"    pm.expect(responseData.precio).to.exist;",
+							"    pm.expect(responseData.categoria).to.exist;",
+							"    // pm.expect(responseData.idPlato).to.exist;",
+							"});",
+							"",
+							"var data = pm.response.json()",
+							"pm.collectionVariables.set(\"platoId\", data.idPlato);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"{{$randomLoremWords}}\",\n  \"descripcion\": \"{{$randomLoremSentence}}\",\n  \"precio\": {{$randomPrice}},\n  \"categoria\": \"plato_fuerte\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlPlato}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlPlato}}"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:3000/api/v1/dishes \\\n-H \"Content-Type: application/json\" \\\n-d '{\n  \"nombre\": \"Pasta Carbonara\",\n  \"descripcion\": \"Pasta con salsa cremosa de huevo, queso parmesano y panceta\",\n  \"precio\": 25.99,\n  \"categoria\": \"plato_fuerte\"\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Crear un plato inválido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 400\", function () {",
+							"    pm.expect(pm.response.code).to.equal(400);",
+							"});",
+							"",
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.statusCode).to.exist;",
+							"    pm.expect(responseData.message).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"\",\n  \"descripcion\": \"\",\n  \"precio\": -1,\n  \"categoria\": \"invalid_category\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlPlato}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlPlato}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener todos los platos",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response is an array\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlPlato}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlPlato}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener un plato por ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.nombre).to.exist;",
+							"    pm.expect(responseData.descripcion).to.exist;",
+							"    pm.expect(responseData.precio).to.exist;",
+							"    pm.expect(responseData.categoria).to.exist;",
+							"    pm.expect(responseData.idPlato).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlPlato}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlPlato}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{platoId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener un plato por un ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlPlato}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlPlato}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{$guid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar un plato",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlPlato = pm.collectionVariables.get('baseUrlPlato');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlPlato) throw new Error('⚠️ La variable baseUrlPlato no está definida');",
+							"",
+							"// payload plato",
+							"const platoNombre = pm.variables.replaceIn('{{$randomLoremWords}}');",
+							"const platoDescripcion = pm.variables.replaceIn('{{$randomLoremSentence}}');",
+							"const platoPrecio = pm.variables.replaceIn('{{$randomPrice}}');",
+							"const platoCategoria = \"plato_fuerte\";",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear plato",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlPlato}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: platoNombre,",
+							"      descripcion: platoDescripcion,",
+							"      precio: platoPrecio,",
+							"      categoria: platoCategoria",
+							"    })",
+							"  }",
+							"}, (errC, resPlato) => {",
+							"  if (errC) throw errC;",
+							"  const plato = resPlato.json();",
+							"  const idPlato = plato.idPlato;",
+							"  pm.environment.set('platoId', idPlato);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response has updated fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.nombre).to.exist;",
+							"    pm.expect(responseData.descripcion).to.exist;",
+							"    pm.expect(responseData.precio).to.exist;",
+							"    pm.expect(responseData.categoria).to.exist;",
+							"    pm.expect(responseData.idPlato).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"{{$randomLoremWords}}\",\n  \"descripcion\": \"{{$randomLoremSentence}}\",\n  \"precio\": {{$randomPrice}},\n  \"categoria\": \"plato_fuerte\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlPlato}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlPlato}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{platoId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar un plato con un ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"{{$randomLoremWords}}\",\n  \"descripcion\": \"{{$randomLoremSentence}}\",\n  \"precio\": {{$randomPrice}},\n  \"categoria\": \"plato_fuerte\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlPlato}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlPlato}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{$guid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar un plato por su ID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlPlato = pm.collectionVariables.get('baseUrlPlato');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlPlato) throw new Error('⚠️ La variable baseUrlPlato no está definida');",
+							"",
+							"// payload plato",
+							"const platoNombre = pm.variables.replaceIn('{{$randomLoremWords}}');",
+							"const platoDescripcion = pm.variables.replaceIn('{{$randomLoremSentence}}');",
+							"const platoPrecio = pm.variables.replaceIn('{{$randomPrice}}');",
+							"const platoCategoria = \"plato_fuerte\";",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear plato",
+							"pm.sendRequest({",
+							"  url: `${baseUrl}/${baseUrlPlato}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"      nombre: platoNombre,",
+							"      descripcion: platoDescripcion,",
+							"      precio: platoPrecio,",
+							"      categoria: platoCategoria",
+							"    })",
+							"  }",
+							"}, (errC, resPlato) => {",
+							"  if (errC) throw errC;",
+							"  const plato = resPlato.json();",
+							"  const idPlato = plato.idPlato;",
+							"  pm.environment.set('platoId', idPlato);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 204\", function () {",
+							"    pm.expect(pm.response.code).to.equal(204);",
+							"});",
+							"",
+							"pm.test(\"Response has no body\", function () {",
+							"    pm.expect(pm.response.text()).to.be.empty;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlPlato}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlPlato}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{platoId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar un plato con un ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlPlato}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlPlato}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{$guid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "baseUrlPlato",
+			"value": "dishes",
+			"type": "string"
+		},
+		{
+			"key": "platoId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

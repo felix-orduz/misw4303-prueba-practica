@@ -31,9 +31,9 @@ export class PlatoService {
     return cached;
   }
 
-  async findOne(id: number): Promise<PlatoEntity> {
+  async findOne(idPlato: string): Promise<PlatoEntity> {
     const plato: PlatoEntity = await this.platoRepository.findOne({
-      where: { id },
+      where: { idPlato },
       relations: ['restaurantes'],
     });
     if (!plato)
@@ -62,9 +62,9 @@ export class PlatoService {
     return await this.platoRepository.save(plato);
   }
 
-  async update(id: number, plato: PlatoEntity): Promise<PlatoEntity> {
+  async update(idPlato: string, plato: PlatoEntity): Promise<PlatoEntity> {
     const persistedPlato: PlatoEntity = await this.platoRepository.findOne({
-      where: { id },
+      where: { idPlato },
     });
     if (!persistedPlato)
       throw new BusinessLogicException(
@@ -92,9 +92,9 @@ export class PlatoService {
     });
   }
 
-  async delete(id: number) {
+  async delete(idPlato: string) {
     const plato: PlatoEntity = await this.platoRepository.findOne({
-      where: { id },
+      where: { idPlato },
     });
     if (!plato)
       throw new BusinessLogicException(

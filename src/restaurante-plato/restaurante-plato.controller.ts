@@ -3,60 +3,54 @@ import {
   Controller,
   Get,
   Post,
+  Put,
+  Delete,
   Body,
   Param,
-  Delete,
-  Put,
   HttpCode,
-  UseInterceptors,
 } from '@nestjs/common';
 import { RestaurantePlatoService } from './restaurante-plato.service';
-import { RestauranteEntity } from '../restaurante/restaurante.entity';
 import { PlatoEntity } from '../plato/plato.entity';
-import { BusinessErrorsInterceptor } from '../shared/interceptors/business-errors.interceptor';
 
-@Controller('restaurants')
-@UseInterceptors(BusinessErrorsInterceptor)
+@Controller('restaurantes')
 export class RestaurantePlatoController {
   constructor(private readonly restaurantePlatoService: RestaurantePlatoService) {}
 
-  @Post(':restauranteId/dishes/:platoId')
-  async addDishToRestaurant(
+  @Post(':restauranteId/platos/:platoId')
+  async addPlatoRestaurante(
     @Param('restauranteId') restauranteId: string,
-    @Param('platoId') platoId: number,
-  ): Promise<RestauranteEntity> {
-    return await this.restaurantePlatoService.addDishToRestaurant(restauranteId, platoId);
+    @Param('platoId') platoId: string,
+  ) {
+    return await this.restaurantePlatoService.addPlatoRestaurante(restauranteId, platoId);
   }
 
-  @Get(':restauranteId/dishes')
-  async findDishesFromRestaurant(
-    @Param('restauranteId') restauranteId: string,
-  ): Promise<PlatoEntity[]> {
-    return await this.restaurantePlatoService.findDishesFromRestaurant(restauranteId);
+  @Get(':restauranteId/platos')
+  async findPlatosByRestauranteId(@Param('restauranteId') restauranteId: string) {
+    return await this.restaurantePlatoService.findPlatosByRestauranteId(restauranteId);
   }
 
-  @Get(':restauranteId/dishes/:platoId')
-  async findDishFromRestaurant(
+  @Get(':restauranteId/platos/:platoId')
+  async findPlatoByRestauranteIdPlatoId(
     @Param('restauranteId') restauranteId: string,
-    @Param('platoId') platoId: number,
-  ): Promise<PlatoEntity> {
-    return await this.restaurantePlatoService.findDishFromRestaurant(restauranteId, platoId);
+    @Param('platoId') platoId: string,
+  ) {
+    return await this.restaurantePlatoService.findPlatoByRestauranteIdPlatoId(restauranteId, platoId);
   }
 
-  @Put(':restauranteId/dishes')
-  async updateDishesFromRestaurant(
+  @Put(':restauranteId/platos')
+  async associatePlatosRestaurante(
     @Param('restauranteId') restauranteId: string,
     @Body() platos: PlatoEntity[],
-  ): Promise<RestauranteEntity> {
-    return await this.restaurantePlatoService.updateDishesFromRestaurant(restauranteId, platos);
+  ) {
+    return await this.restaurantePlatoService.associatePlatosRestaurante(restauranteId, platos);
   }
 
-  @Delete(':restauranteId/dishes/:platoId')
+  @Delete(':restauranteId/platos/:platoId')
   @HttpCode(204)
-  async deleteDishFromRestaurant(
+  async deletePlatoRestaurante(
     @Param('restauranteId') restauranteId: string,
-    @Param('platoId') platoId: number,
+    @Param('platoId') platoId: string,
   ) {
-    await this.restaurantePlatoService.deleteDishFromRestaurant(restauranteId, platoId);
+    await this.restaurantePlatoService.deletePlatoRestaurante(restauranteId, platoId);
   }
 }

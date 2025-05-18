@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PlatoEntity } from './plato.entity';
 import { PlatoService } from './plato.service';
+import { PlatoController } from './plato.controller';
 import * as sqliteStore from 'cache-manager-sqlite';
 
 @Module({
@@ -16,7 +17,7 @@ import * as sqliteStore from 'cache-manager-sqlite';
       path: ':memory:',
     }),
   ],
-  controllers: [],
+  controllers: [PlatoController],
   providers: [PlatoService],
   exports: [PlatoService],
 })

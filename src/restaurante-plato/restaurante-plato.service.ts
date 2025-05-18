@@ -18,10 +18,19 @@ export class RestaurantePlatoService {
     private readonly platoRepository: Repository<PlatoEntity>,
   ) {}
 
-  async addDishToRestaurant(
+  async addPlatoRestaurante(
     restauranteId: string,
-    platoId: number,
+    platoId: string,
   ): Promise<RestauranteEntity> {
+    const plato: PlatoEntity = await this.platoRepository.findOne({
+      where: { idPlato: platoId },
+    });
+    if (!plato)
+      throw new BusinessLogicException(
+        'El plato con el id dado no fue encontrado',
+        BusinessError.NOT_FOUND,
+      );
+
     const restaurante: RestauranteEntity = await this.restauranteRepository.findOne({
       where: { idRestaurante: restauranteId },
       relations: ['platos'],
@@ -32,22 +41,38 @@ export class RestaurantePlatoService {
         BusinessError.NOT_FOUND,
       );
 
-    const plato: PlatoEntity = await this.platoRepository.findOne({
-      where: { id: platoId },
-    });
-    if (!plato)
-      throw new BusinessLogicException(
-        'El plato con el id dado no fue encontrado',
-        BusinessError.NOT_FOUND,
-      );
-
     restaurante.platos = [...restaurante.platos, plato];
     return await this.restauranteRepository.save(restaurante);
   }
 
-  async findDishesFromRestaurant(
+  async findPlatoByRestauranteIdPlatoId(
     restauranteId: string,
-  ): Promise<PlatoEntity[]> {
+    platoId: string,
+  ): Promise<PlatoEntity> {
+    const restaurante: RestauranteEntity = await this.restauranteRepository.findOne({
+      where: { idRestaurante: restauranteId },
+      relations: ['platos'],
+    });
+    if (!restaurante)
+      throw new BusinessLogicException(
+        'El restaurante con el id dado no fue encontrado',
+        BusinessError.NOT_FOUND,
+      );
+
+    const persistedPlato: PlatoEntity = restaurante.platos.find(
+      (p) => p.idPlato === platoId,
+    );
+
+    if (!persistedPlato)
+      throw new BusinessLogicException(
+        'El plato con el id dado no fue encontrado en el restaurante',
+        BusinessError.PRECONDITION_FAILED,
+      );
+
+    return persistedPlato;
+  }
+
+  async findPlatosByRestauranteId(restauranteId: string): Promise<PlatoEntity[]> {
     const restaurante: RestauranteEntity = await this.restauranteRepository.findOne({
       where: { idRestaurante: restauranteId },
       relations: ['platos'],
@@ -61,33 +86,7 @@ export class RestaurantePlatoService {
     return restaurante.platos;
   }
 
-  async findDishFromRestaurant(
-    restauranteId: string,
-    platoId: number,
-  ): Promise<PlatoEntity> {
-    const restaurante: RestauranteEntity = await this.restauranteRepository.findOne({
-      where: { idRestaurante: restauranteId },
-      relations: ['platos'],
-    });
-    if (!restaurante)
-      throw new BusinessLogicException(
-        'El restaurante con el id dado no fue encontrado',
-        BusinessError.NOT_FOUND,
-      );
-
-    const plato: PlatoEntity = restaurante.platos.find(
-      (p) => p.id === platoId,
-    );
-    if (!plato)
-      throw new BusinessLogicException(
-        'El plato no está asociado al restaurante',
-        BusinessError.NOT_FOUND,
-      );
-
-    return plato;
-  }
-
-  async updateDishesFromRestaurant(
+  async associatePlatosRestaurante(
     restauranteId: string,
     platos: PlatoEntity[],
   ): Promise<RestauranteEntity> {
@@ -95,20 +94,20 @@ export class RestaurantePlatoService {
       where: { idRestaurante: restauranteId },
       relations: ['platos'],
     });
+
     if (!restaurante)
       throw new BusinessLogicException(
         'El restaurante con el id dado no fue encontrado',
         BusinessError.NOT_FOUND,
       );
 
-    // Validate that all platos exist
-    for (const plato of platos) {
-      const platoExists = await this.platoRepository.findOne({
-        where: { id: plato.id },
+    for (let i = 0; i < platos.length; i++) {
+      const plato: PlatoEntity = await this.platoRepository.findOne({
+        where: { idPlato: platos[i].idPlato },
       });
-      if (!platoExists)
+      if (!plato)
         throw new BusinessLogicException(
-          `El plato con id ${plato.id} no fue encontrado`,
+          `El plato con id ${platos[i].idPlato} no fue encontrado`,
           BusinessError.NOT_FOUND,
         );
     }
@@ -117,10 +116,7 @@ export class RestaurantePlatoService {
     return await this.restauranteRepository.save(restaurante);
   }
 
-  async deleteDishFromRestaurant(
-    restauranteId: string,
-    platoId: number,
-  ): Promise<RestauranteEntity> {
+  async deletePlatoRestaurante(restauranteId: string, platoId: string) {
     const restaurante: RestauranteEntity = await this.restauranteRepository.findOne({
       where: { idRestaurante: restauranteId },
       relations: ['platos'],
@@ -131,16 +127,26 @@ export class RestaurantePlatoService {
         BusinessError.NOT_FOUND,
       );
 
-    const plato: PlatoEntity = restaurante.platos.find(
-      (p) => p.id === platoId,
-    );
+    const plato: PlatoEntity = await this.platoRepository.findOne({
+      where: { idPlato: platoId },
+    });
     if (!plato)
       throw new BusinessLogicException(
-        'El plato no está asociado al restaurante',
+        'El plato con el id dado no fue encontrado',
         BusinessError.NOT_FOUND,
       );
 
-    restaurante.platos = restaurante.platos.filter((p) => p.id !== platoId);
-    return await this.restauranteRepository.save(restaurante);
+    const restaurantePlato: PlatoEntity = restaurante.platos.find(
+      (p) => p.idPlato === platoId,
+    );
+
+    if (!restaurantePlato)
+      throw new BusinessLogicException(
+        'El plato con el id dado no está asociado al restaurante',
+        BusinessError.PRECONDITION_FAILED,
+      );
+
+    restaurante.platos = restaurante.platos.filter((p) => p.idPlato !== platoId);
+    await this.restauranteRepository.save(restaurante);
   }
 }

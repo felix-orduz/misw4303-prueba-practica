@@ -1,0 +1,613 @@
+{
+	"info": {
+		"_postman_id": "0aca3cb4-37f6-48eb-b786-dcbff0317f86",
+		"name": "Restaurante",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43873552"
+	},
+	"item": [
+		{
+			"name": "Crear un restaurante válido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {",
+							"    pm.expect(pm.response.code).to.equal(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has the required fields - nombre, tipoCocina, direccion, and idRestaurante\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.be.an('object');",
+							"  pm.expect(responseData.nombre).to.exist;",
+							"  pm.expect(responseData.tipoCocina).to.exist;",
+							"  pm.expect(responseData.direccion).to.exist;",
+							"  pm.expect(responseData.idRestaurante).to.exist;",
+							"});",
+							"",
+							"",
+							"pm.test(\"Nombre is a non-empty string\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.nombre).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Nombre should not be empty\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"TipoCocina is a non-empty string\", function () {",
+							"    const responseData = pm.response.json();",
+							"",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.tipoCocina).to.be.a('string').and.to.have.lengthOf.at.least(1, \"TipoCocina should not be empty\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Direccion is a non-empty string\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.be.an('object');",
+							"  pm.expect(responseData.direccion).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"Direccion should not be empty\");",
+							"});",
+							"",
+							"var data = pm.response.json()",
+							"pm.collectionVariables.set(\"restaurantId\", data.idRestaurante);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"{{$randomCompanyName}}\",\n  \"tipoCocina\": \"italiana\",\n  \"direccion\": \"{{$randomStreetAddress}}\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:3000/api/v1/restaurants \\\n-H \"Content-Type: application/json\" \\\n-d '{\n  \"nombre\": \"La Trattoria\",\n  \"tipoCocina\": \"italiana\",\n  \"direccion\": \"Calle 123 #45-67\"\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Crear un restaurante inválido.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 400\", function () {",
+							"    pm.expect(pm.response.code).to.equal(400);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.statusCode).to.exist;",
+							"    pm.expect(responseData.message).to.exist;",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"  pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"{{$randomCompanyName}}\",\n  \"tipoCocina\": \"{{$randomColor}}\",\n  \"direccion\": \"{{$randomStreetAddress}}\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:3000/api/v1/restaurants \\\n-H \"Content-Type: application/json\" \\\n-d '{\n  \"nombre\": \"La Trattoria\",\n  \"tipoCocina\": \"italiana\",\n  \"direccion\": \"Calle 123 #45-67\"\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener todos los restaurantes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response is an array\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener un restaurante por ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.nombre).to.exist;",
+							"    pm.expect(responseData.tipoCocina).to.exist;",
+							"    pm.expect(responseData.direccion).to.exist;",
+							"    pm.expect(responseData.idRestaurante).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{restaurantId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener un restaurante por un ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{$guid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar un restaurante",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response has updated fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.nombre).to.exist;",
+							"    pm.expect(responseData.tipoCocina).to.exist;",
+							"    pm.expect(responseData.direccion).to.exist;",
+							"    pm.expect(responseData.idRestaurante).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl       = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants  = pm.collectionVariables.get('baseUrlRestaurants');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"",
+							"// payload restaurante",
+							"",
+							"const restauranteNombre = \"{{$randomCompanyName}}\";",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = \"{{$randomStreetAddress}}\";",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear restaurante",
+							"pm.sendRequest({",
+							"  url:    `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body:   {",
+							"    mode: 'raw',",
+							"    raw:  JSON.stringify({",
+							"      nombre:      restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) throw errC;",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"{{$randomCompanyName}}\",\n  \"tipoCocina\": \"italiana\",\n  \"direccion\": \"{{$randomStreetAddress}}\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{restaurantId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar un restaurante con un ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"{{$randomCompanyName}}\",\n  \"tipoCocina\": \"italiana\",\n  \"direccion\": \"{{$randomStreetAddress}}\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{$guid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar un restaurante por su ID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// ——————————————————————————",
+							"// 1) Recuperar y validar vars",
+							"const baseUrl       = pm.collectionVariables.get('baseUrl');",
+							"const baseUrlRestaurants  = pm.collectionVariables.get('baseUrlRestaurants');",
+							"",
+							"if (!baseUrl) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"if (!baseUrlRestaurants) throw new Error('⚠️ La variable baseUrl no está definida');",
+							"",
+							"// payload restaurante",
+							"",
+							"const restauranteNombre = \"{{$randomCompanyName}}\";",
+							"const restauranteTipoCocina = 'italiana';",
+							"const restauranteDireccion = \"{{$randomStreetAddress}}\";",
+							"",
+							"// ——————————————————————————",
+							"// 2) Crear restaurante",
+							"pm.sendRequest({",
+							"  url:    `${baseUrl}/${baseUrlRestaurants}`,",
+							"  method: 'POST',",
+							"  header: { 'Content-Type': 'application/json' },",
+							"  body:   {",
+							"    mode: 'raw',",
+							"    raw:  JSON.stringify({",
+							"      nombre:      restauranteNombre,",
+							"      tipoCocina: restauranteTipoCocina,",
+							"      direccion: restauranteDireccion",
+							"    })",
+							"  }",
+							"}, (errC, resRestaurante) => {",
+							"  if (errC) throw errC;",
+							"  const restaurante = resRestaurante.json();",
+							"  const idRestaurante = restaurante.idRestaurante;",
+							"  pm.environment.set('restaurantId', idRestaurante);",
+							"",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 204\", function () {",
+							"    pm.expect(pm.response.code).to.equal(204);",
+							"});",
+							"",
+							"pm.test(\"Response has no body\", function () {",
+							"    pm.expect(pm.response.text()).to.be.empty;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{restaurantId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar un restaurante con un ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});",
+							"",
+							"pm.test(\"Response has error message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{baseUrlRestaurants}}/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{baseUrlRestaurants}}",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{$guid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "baseUrlRestaurants",
+			"value": "restaurants",
+			"type": "string"
+		},
+		{
+			"key": "restaurantId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

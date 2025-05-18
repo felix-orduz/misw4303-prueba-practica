@@ -10,8 +10,9 @@ export enum CategoriaPlato {
 
 @Entity()
 export class PlatoEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  @Column({ type: 'uuid', primary: true })
+  idPlato: string;
 
   @Column()
   nombre: string;
@@ -37,7 +38,7 @@ export class PlatoEntity {
     name: 'plato_restaurante',
     joinColumn: {
       name: 'plato_id',
-      referencedColumnName: 'id',
+      referencedColumnName: 'idPlato',
     },
     inverseJoinColumn: {
       name: 'restaurante_id',

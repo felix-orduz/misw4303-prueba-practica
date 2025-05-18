@@ -25,7 +25,7 @@ export class PlatoController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<PlatoEntity> {
+  async findOne(@Param('id') id: string): Promise<PlatoEntity> {
     return await this.platoService.findOne(id);
   }
 
@@ -36,7 +36,7 @@ export class PlatoController {
 
   @Put(':id')
   async update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() plato: PlatoEntity,
   ): Promise<PlatoEntity> {
     return await this.platoService.update(id, plato);
@@ -44,7 +44,7 @@ export class PlatoController {
 
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('id') id: number) {
+  async delete(@Param('id') id: string) {
     await this.platoService.delete(id);
   }
 }
